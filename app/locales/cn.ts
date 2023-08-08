@@ -249,6 +249,7 @@ const cn = {
     Add: "新增预设对话",
     Clear: "上下文已清除",
     Revert: "恢复上下文",
+    newRole: "新增角色",
   },
   Plugin: {
     Name: "插件",
@@ -291,6 +292,10 @@ const cn = {
         Title: "是否作为绘画",
         SubTitle: "设置后只作为绘画",
       },
+    },
+    Role: {
+      name: "对话轮数",
+      SubTitle: "每个角色的对话次数",
     },
   },
   NewChat: {
