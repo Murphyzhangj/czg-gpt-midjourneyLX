@@ -24,7 +24,8 @@ const en: RequiredLocaleType = {
     ModeDescribe: "Describe Mode",
     NeedInputUseImgPrompt:
       'You need to enter content to use the image in the mask mode, please enter the content starting with "/mj"',
-    BlendMinImg: (min: number,max:number) => `At least ${min} images are required in the mixed image mode, and up to ${max} images are required`,
+    BlendMinImg: (min: number, max: number) =>
+      `At least ${min} images are required in the mixed image mode, and up to ${max} images are required`,
     TaskErrUnknownType: "Task submission failed: unknown task type",
     TaskErrNotSupportType: (type: string) =>
       `Task submission failed: unsupported task type -> ${type}`,
@@ -243,12 +244,18 @@ const en: RequiredLocaleType = {
     Add: "Add a Prompt",
     Clear: "Context Cleared",
     Revert: "Revert",
+    newRole: "新增角色",
+    AddMeet: "新建AI会议",
+    EditMeet: "编辑当前AI会议",
   },
   Plugin: {
     Name: "Plugin",
   },
   Mask: {
     Name: "Mask",
+    Meet: {
+      Add: "新增会议",
+    },
     Page: {
       Title: "Prompt Template",
       SubTitle: (count: number) => `${count} prompt templates`,
@@ -285,6 +292,14 @@ const en: RequiredLocaleType = {
         Title: "As a painting or not",
         SubTitle: "After setting, only use as painting",
       },
+    },
+    Role: {
+      name: "对话轮数",
+      SubTitle: "每个角色的对话次数",
+      place: "请输入角色名称",
+      description: (count: number, name: string) =>
+        `作为${name}角色对上述对话进行第${count}轮发言，并总结`,
+      secretary: "你是一个会议秘书，请为以上圆桌会议内容进行总结，简明扼要",
     },
   },
   NewChat: {
