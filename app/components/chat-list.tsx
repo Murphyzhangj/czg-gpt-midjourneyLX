@@ -95,7 +95,7 @@ export function ChatList(props: { narrow?: boolean }) {
   const [sessions, selectedIndex, selectSession, moveSession] = useChatStore(
     (state) => [
       state.sessions,
-      state.onUserInputIndex,
+      state.currentSessionIndex,
       state.selectSession,
       state.moveSession,
     ],
