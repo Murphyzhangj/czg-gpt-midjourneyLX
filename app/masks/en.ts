@@ -12,7 +12,9 @@ export const EN_MASKS: BuiltinMask[] = [
         date: "",
       },
     ],
+    newRole: [],
     modelConfig: {
+      roleNumber: 1,
       model: "gpt-4",
       temperature: 0.3,
       max_tokens: 2000,
@@ -52,7 +54,9 @@ export const EN_MASKS: BuiltinMask[] = [
         date: "",
       },
     ],
+    newRole: [],
     modelConfig: {
+      roleNumber: 1,
       model: "gpt-4",
       temperature: 0.5,
       max_tokens: 2000,
@@ -75,7 +79,9 @@ export const EN_MASKS: BuiltinMask[] = [
         date: "",
       },
     ],
+    newRole: [],
     modelConfig: {
+      roleNumber: 1,
       model: "gpt-3.5-turbo",
       temperature: 0.5,
       max_tokens: 2000,
@@ -103,7 +109,9 @@ export const EN_MASKS: BuiltinMask[] = [
         date: "",
       },
     ],
+    newRole: [],
     modelConfig: {
+      roleNumber: 1,
       model: "gpt-4",
       temperature: 0.5,
       max_tokens: 2000,

@@ -244,9 +244,9 @@ const en: RequiredLocaleType = {
     Add: "Add a Prompt",
     Clear: "Context Cleared",
     Revert: "Revert",
-    newRole: "新增角色",
-    AddMeet: "新建AI会议",
-    EditMeet: "编辑当前AI会议",
+    newRole: "AddRole",
+    AddMeet: "AddAImeet",
+    EditMeet: "EditAImeet",
   },
   Plugin: {
     Name: "Plugin",
@@ -254,7 +254,7 @@ const en: RequiredLocaleType = {
   Mask: {
     Name: "Mask",
     Meet: {
-      Add: "新增会议",
+      Add: "Addmeet",
     },
     Page: {
       Title: "Prompt Template",
