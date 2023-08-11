@@ -12,7 +12,7 @@ import {
 import { useChatStore } from "../store";
 
 import Locale from "../locales";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Path } from "../constant";
 import { MaskAvatar } from "./mask";
 import { Mask } from "../store/mask";
@@ -95,16 +95,17 @@ export function ChatList(props: { narrow?: boolean }) {
   const [sessions, selectedIndex, selectSession, moveSession] = useChatStore(
     (state) => [
       state.sessions,
-      state.currentSessionIndex,
+      state.onUserInputIndex,
       state.selectSession,
       state.moveSession,
     ],
   );
   const chatStore = useChatStore();
   const navigate = useNavigate();
-
+  const location = useLocation();
   const onDragEnd: OnDragEndResponder = (result) => {
     const { destination, source } = result;
+
     if (!destination) {
       return;
     }
@@ -138,7 +139,11 @@ export function ChatList(props: { narrow?: boolean }) {
                 index={i}
                 selected={i === selectedIndex}
                 onClick={() => {
-                  navigate(Path.Chat);
+                  navigate(
+                    location.pathname === Path.Meetings
+                      ? Path.Meetings
+                      : Path.Chat,
+                  );
                   selectSession(i);
                 }}
                 onDelete={() => {

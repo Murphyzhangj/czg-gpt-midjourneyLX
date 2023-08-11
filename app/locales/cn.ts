@@ -250,12 +250,17 @@ const cn = {
     Clear: "上下文已清除",
     Revert: "恢复上下文",
     newRole: "新增角色",
+    AddMeet: "新建AI会议",
+    EditMeet: "编辑当前AI会议",
   },
   Plugin: {
     Name: "插件",
   },
   Mask: {
     Name: "面具",
+    Meet: {
+      Add: "新增会议",
+    },
     Page: {
       Title: "预设角色面具",
       SubTitle: (count: number) => `${count} 个预设角色定义`,
@@ -296,6 +301,10 @@ const cn = {
     Role: {
       name: "对话轮数",
       SubTitle: "每个角色的对话次数",
+      place: "请输入角色名称",
+      description: (count: number, name: string) =>
+        `作为${name}角色对上述对话进行第${count}轮发言，并总结`,
+      secretary: "你是一个会议秘书，请为以上圆桌会议内容进行总结，简明扼要",
     },
   },
   NewChat: {

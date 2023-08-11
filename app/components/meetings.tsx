@@ -351,7 +351,7 @@ export function ChatActions(props: {
     };
     e.target.value = null;
   };
-
+  console.log("我的城市", props);
   return (
     <div className={chatStyle["chat-input-actions"]}>
       {couldStop && (
@@ -755,7 +755,6 @@ export function Chat() {
       chatStore.fetchMidjourneyStatus(msg);
     }
   });
-
   return (
     <div className={styles.chat} key={session.id}>
       <div className="window-header">

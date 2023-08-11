@@ -77,15 +77,15 @@ export function MaskConfig(props: {
           props.updateMask((mask) => (mask.context = context));
         }}
         updateRole={(updater) => {
-          // console.log('更新测试',props)
-          const newRole = props.mask.newRole.slice();
+          console.log("更新测试", props);
+          const newRole = props.mask.newRole?.slice();
           updater(newRole);
           props.updateMask((mask) => (mask.newRole = newRole));
         }}
       />
 
       <List>
-        {props.mask.newRole.length > 0 ? (
+        {props.mask?.newRole?.length > 0 ? (
           <ListItem
             title={Locale.Mask.Role.name}
             subTitle={Locale.Mask.Role.SubTitle}
@@ -341,6 +341,7 @@ export function ContextRoleItem(props: {
           <input
             type="text"
             value={props.prompt.content}
+            placeholder={Locale.Mask.Role.place}
             onInput={(e) =>
               props.update({
                 ...props.prompt,
@@ -417,7 +418,7 @@ export function ContextPrompts(props: {
       {/* 新增角色 */}
 
       <div className={chatStyle["context-prompt"]} style={{ marginBottom: 20 }}>
-        {rolearr.map((c, i) => (
+        {rolearr?.map((c, i) => (
           <ContextRoleItem
             key={i}
             prompt={c}
@@ -474,6 +475,7 @@ export function MaskPage() {
   const [editingMaskId, setEditingMaskId] = useState<number | undefined>();
   const editingMask =
     maskStore.get(editingMaskId) ?? BUILTIN_MASK_STORE.get(editingMaskId);
+  console.log("打印一下", editingMask);
   const closeMaskModal = () => setEditingMaskId(undefined);
 
   const downloadAll = () => {

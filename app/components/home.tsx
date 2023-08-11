@@ -22,6 +22,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { SideBar } from "./sidebar";
+import { SideBarM } from "./sidebarM";
 import { useAppConfig } from "../store/config";
 import { AuthPage } from "./auth";
 
@@ -50,6 +51,9 @@ const MaskPage = dynamic(async () => (await import("./mask")).MaskPage, {
   loading: () => <Loading noLogo />,
 });
 
+const Meetings = dynamic(async () => (await import("./meetings")).Chat, {
+  loading: () => <Loading noLogo />,
+});
 export function useSwitchTheme() {
   const config = useAppConfig();
 
@@ -105,7 +109,9 @@ function Screen() {
   const isHome = location.pathname === Path.Home;
   const isMobileScreen = useMobileScreen();
   const isAuth = location.pathname === Path.Auth;
+  const isMeet = location.pathname === Path.Meetings;
 
+  // console.log('就交卷',location.pathname,Path)
   useEffect(() => {
     loadAsyncGoogleFont();
   }, []);
@@ -127,7 +133,15 @@ function Screen() {
         </>
       ) : (
         <>
-          <SideBar className={isHome ? styles["sidebar-show"] : ""} />
+          {isMeet ? (
+            <>
+              <SideBarM className={isHome ? styles["sidebar-show"] : ""} />
+            </>
+          ) : (
+            <>
+              <SideBar className={isHome ? styles["sidebar-show"] : ""} />
+            </>
+          )}
 
           <div className={styles["window-content"]} id={SlotID.AppBody}>
             <Routes>
@@ -136,6 +150,7 @@ function Screen() {
               <Route path={Path.Masks} element={<MaskPage />} />
               <Route path={Path.Chat} element={<Chat />} />
               <Route path={Path.Settings} element={<Settings />} />
+              <Route path={Path.Meetings} element={<Meetings />} />
             </Routes>
           </div>
         </>

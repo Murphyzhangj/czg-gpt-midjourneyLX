@@ -365,13 +365,13 @@ export const useChatStore = create<ChatStore>()(
         if (session?.mask?.newRole?.length > 0) {
           // console.log('打印新函数',session)
           // session.mask.newRole.map((item, i) => {
-          console.log(
-            "接口就回家",
-            get().roleIdx,
-            index,
-            session,
-            get().roleIdx == index,
-          );
+          // console.log(
+          //   "接口就回家",
+          //   get().roleIdx,
+          //   index,
+          //   session,
+          //   get().roleIdx == index,
+          // );
 
           if (get().roleIdx == index) {
             // topicMessages.concat(
@@ -382,12 +382,15 @@ export const useChatStore = create<ChatStore>()(
             // )
             let content;
             if (index == session.mask.newRole?.length) {
-              content =
-                "你是一个会议秘书，请为以上圆桌会议内容进行总结，简明扼要";
+              content = Locale.Mask.Role.secretary;
             } else {
-              content = `作为${
-                session.mask.newRole[index].content
-              }角色对上述对话进行第${get().roundRole}轮发言，并总结`;
+              // content = `作为${
+              //   session.mask.newRole[index].content
+              // }角色对上述对话进行第${get().roundRole}轮发言，并总结`;
+              content = Locale.Mask.Role.description(
+                get().roundRole,
+                session.mask.newRole[index].content,
+              );
             }
             topicMessages.push(
               createMessage({
@@ -525,6 +528,7 @@ export const useChatStore = create<ChatStore>()(
               resolve(false);
             });
           }
+
           content = `/mj ${extAttr?.mjImageMode}`;
           extAttr.useImages.forEach((img: any, index: number) => {
             content += `::[${index + 1}]${img.filename}`;
