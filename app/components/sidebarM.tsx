@@ -11,7 +11,7 @@ import BrainIcon from "../icons/brain.svg";
 import CopyIcon from "../icons/copy.svg";
 import NextImage from "next/image";
 import Locale from "../locales";
-import { MaskAvatar, MaskConfig } from "./mask";
+import { MaskAvatar, MaskConfig } from "./meet-config";
 import { useMaskStore } from "../store/mask";
 import { BUILTIN_MASK_STORE } from "../masks";
 import { useAppConfig, useChatStore } from "../store";
@@ -26,8 +26,9 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
-import { showToast } from "./ui-lib";
-import { ListItem, Modal } from "./ui-lib";
+import { ListItem, Modal, showToast } from "./meet-ui-lib";
+
+let flagNew = true;
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
 });
@@ -56,14 +57,13 @@ function useHotKey() {
 export function SessionConfigModel(props: {
   onClose: () => void;
   isNew: boolean;
+  editingMask: any;
 }) {
   const chatStore = useChatStore();
   const session = chatStore.currentSession();
   const maskStore = useMaskStore();
   const navigate = useNavigate();
-  const [editingMaskId, setEditingMaskId] = useState<number | undefined>();
-  const editingMask =
-    maskStore.get(editingMaskId) ?? BUILTIN_MASK_STORE.get(editingMaskId);
+
   return (
     <div className="modal-mask">
       <Modal
@@ -74,7 +74,7 @@ export function SessionConfigModel(props: {
             key="reset"
             icon={<ResetIcon />}
             bordered
-            text={Locale.Chat.Config.Reset}
+            text="开始会议"
             onClick={() => {
               if (confirm(Locale.Memory.ResetConfirm)) {
                 chatStore.updateCurrentSession(
@@ -83,26 +83,14 @@ export function SessionConfigModel(props: {
               }
             }}
           />,
-          <IconButton
-            key="copy"
-            icon={<CopyIcon />}
-            bordered
-            text={Locale.Chat.Config.SaveAs}
-            onClick={() => {
-              navigate(Path.Masks);
-              setTimeout(() => {
-                maskStore.create(session.mask);
-              }, 500);
-            }}
-          />,
         ]}
       >
-        {props.isNew && editingMask ? (
+        {props.isNew && props.editingMask ? (
           <>
             <MaskConfig
-              mask={editingMask}
+              mask={props.editingMask}
               updateMask={(updater) =>
-                maskStore.update(editingMaskId!, updater)
+                maskStore.update(props.editingMask.id!, updater)
               }
             />
           </>
@@ -142,11 +130,12 @@ function PromptToast(props: {
   showModal?: boolean;
   setShowModal: (_: boolean) => void;
   isNew: boolean;
+  editingMask: any;
 }) {
   const chatStore = useChatStore();
   const session = chatStore.currentSession();
   const context = session.mask.context;
-
+  const maskStore = useMaskStore();
   return (
     <div className={chatStyle["prompt-toast"]} key="prompt-toast">
       {props.showToast && (
@@ -163,8 +152,15 @@ function PromptToast(props: {
       )}
       {props.showModal && (
         <SessionConfigModel
-          onClose={() => props.setShowModal(false)}
+          onClose={() => {
+            if (props.isNew) {
+              maskStore.delete(props.editingMask?.id);
+            }
+            // console.log('点击关闭')
+            props.setShowModal(false);
+          }}
           isNew={props.isNew}
+          editingMask={props.editingMask}
         />
       )}
     </div>
@@ -228,7 +224,11 @@ export function SideBarM(props: { className?: string }) {
   const navigate = useNavigate();
   const config = useAppConfig();
   const [showPromptModal, setShowPromptModal] = useState(false);
-
+  const maskStore = useMaskStore();
+  const [editingMaskId, setEditingMaskId] = useState<number | undefined>();
+  const editingMask =
+    maskStore.get(editingMaskId) ?? BUILTIN_MASK_STORE.get(editingMaskId);
+  // console.log('晶科科技',props,editingMask)
   useHotKey();
 
   return (
@@ -256,7 +256,12 @@ export function SideBarM(props: { className?: string }) {
           icon={<AddIcon />}
           text={shouldNarrow ? undefined : Locale.Mask.Meet.Add}
           className={styles["sidebar-bar-button"]}
-          onClick={() => setShowPromptModal(true)}
+          onClick={() => {
+            flagNew = true;
+            setShowPromptModal(true);
+            const createdMask = maskStore.create();
+            setEditingMaskId(createdMask.id);
+          }}
           shadow
         />
       </div>
@@ -296,7 +301,8 @@ export function SideBarM(props: { className?: string }) {
         showToast={!hitBottom}
         showModal={showPromptModal}
         setShowModal={setShowPromptModal}
-        isNew={true}
+        isNew={flagNew}
+        editingMask={editingMask}
       />
     </div>
   );

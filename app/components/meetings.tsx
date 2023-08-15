@@ -53,12 +53,12 @@ import { IconButton } from "./button";
 import styles from "./home.module.scss";
 import chatStyle from "./chat.module.scss";
 
-import { ListItem, Modal } from "./ui-lib";
+import { ListItem, Modal } from "./meet-ui-lib";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LAST_INPUT_KEY, Path, REQUEST_TIMEOUT_MS } from "../constant";
 import { Avatar } from "./emoji";
 import { MaskAvatar, MaskConfig } from "./mask";
-import { useMaskStore } from "../store/mask";
+import { Mask, useMaskStore } from "../store/mask";
 import { useCommand } from "../command";
 import { prettyObject } from "../utils/format";
 import { ExportMessageModal } from "./exporter";
@@ -68,7 +68,6 @@ import Image from "next/image";
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
 });
-
 export function SessionConfigModel(props: { onClose: () => void }) {
   const chatStore = useChatStore();
   const session = chatStore.currentSession();
@@ -85,25 +84,13 @@ export function SessionConfigModel(props: { onClose: () => void }) {
             key="reset"
             icon={<ResetIcon />}
             bordered
-            text={Locale.Chat.Config.Reset}
+            text="开始会议"
             onClick={() => {
               if (confirm(Locale.Memory.ResetConfirm)) {
                 chatStore.updateCurrentSession(
                   (session) => (session.memoryPrompt = ""),
                 );
               }
-            }}
-          />,
-          <IconButton
-            key="copy"
-            icon={<CopyIcon />}
-            bordered
-            text={Locale.Chat.Config.SaveAs}
-            onClick={() => {
-              navigate(Path.Masks);
-              setTimeout(() => {
-                maskStore.create(session.mask);
-              }, 500);
             }}
           />,
         ]}
@@ -351,7 +338,7 @@ export function ChatActions(props: {
     };
     e.target.value = null;
   };
-  console.log("我的城市", props);
+  // console.log("我的城市", props);
   return (
     <div className={chatStyle["chat-input-actions"]}>
       {couldStop && (

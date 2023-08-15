@@ -294,7 +294,7 @@ const en: RequiredLocaleType = {
       },
     },
     Role: {
-      name: "对话轮数",
+      name: "Dialogue Rounds",
       SubTitle: "每个角色的对话次数",
       place: "请输入角色名称",
       description: (count: number, name: string) =>

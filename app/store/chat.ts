@@ -31,6 +31,7 @@ export type newRole = RequestMessage & {
   isError?: boolean;
   id?: number;
   model?: ModelType;
+  attr?: any;
 };
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
   return {

@@ -21,7 +21,7 @@ import {
   newRole,
 } from "../store";
 import { ROLES } from "../client/api";
-import { Input, List, ListItem, Modal, Popover, Select } from "./ui-lib";
+import { Input, List, ListItem, Modal, Popover, Select } from "./meet-ui-lib";
 import { Avatar, AvatarPicker } from "./emoji";
 import Locale, { AllLangs, ALL_LANG_OPTIONS, Lang } from "../locales";
 import { useNavigate } from "react-router-dom";
@@ -65,7 +65,7 @@ export function MaskConfig(props: {
   };
 
   const globalConfig = useAppConfig();
-  console.log("测试一下", props.mask);
+  // console.log('测试一下',props.mask)
   return (
     <>
       <ContextPrompts
@@ -77,7 +77,7 @@ export function MaskConfig(props: {
           props.updateMask((mask) => (mask.context = context));
         }}
         updateRole={(updater) => {
-          console.log("更新测试", props);
+          // console.log("更新测试", props);
           const newRole = props.mask.newRole?.slice();
           updater(newRole);
           props.updateMask((mask) => (mask.newRole = newRole));
@@ -205,50 +205,45 @@ function ContextPromptItem(props: {
   update: (prompt: ChatMessage) => void;
   remove: () => void;
 }) {
-  const [focusingInput, setFocusingInput] = useState(false);
-
   return (
-    <div className={chatStyle["context-prompt-row"]}>
-      {!focusingInput && (
-        <Select
-          value={props.prompt.role}
-          className={chatStyle["context-role"]}
-          onChange={(e) =>
+    <div>
+      <div className={chatStyle["meet-tit"]}>
+        会议主题 <i>*</i>
+      </div>
+      <div className={chatStyle["context-prompt-row"]}>
+        <Input
+          value={props.prompt.content}
+          type="text"
+          className={chatStyle["context-content"]}
+          placeholder="请输入会议主题"
+          rows={1}
+          onInput={(e) =>
             props.update({
               ...props.prompt,
-              role: e.target.value as any,
+              content: e.currentTarget.value as any,
             })
           }
-        >
-          {ROLES.map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
-          ))}
-        </Select>
-      )}
-      <Input
-        value={props.prompt.content}
-        type="text"
-        className={chatStyle["context-content"]}
-        rows={focusingInput ? 5 : 1}
-        onFocus={() => setFocusingInput(true)}
-        onBlur={() => setFocusingInput(false)}
-        onInput={(e) =>
-          props.update({
-            ...props.prompt,
-            content: e.currentTarget.value as any,
-          })
-        }
-      />
-      {!focusingInput && (
-        <IconButton
-          icon={<DeleteIcon />}
-          className={chatStyle["context-delete-button"]}
-          onClick={() => props.remove()}
-          bordered
         />
-      )}
+      </div>
+
+      <div className={chatStyle["meet-tit"]}>
+        会议轮数 <i>*</i>
+      </div>
+      <div className={chatStyle["context-prompt-row"]}>
+        <Input
+          value={props.prompt.content}
+          type="number"
+          className={chatStyle["context-content"]}
+          placeholder="请输入会议轮数(此设置仅影响每个身份的发言次数)"
+          rows={1}
+          onInput={(e) =>
+            props.update({
+              ...props.prompt,
+              content: e.currentTarget.value as any,
+            })
+          }
+        />
+      </div>
     </div>
   );
 }
@@ -272,70 +267,6 @@ export function ContextRoleItem(props: {
               bordered
             />
           </div>
-          {/* <Popover
-            content={
-              <AvatarPicker
-                onEmojiClick={(emoji) => {
-                  props.update({
-
-                  });
-                  setShowPicker(false);
-                }}
-                onChange={(e) =>
-                  props.update({
-                    ...props.prompt,
-                    role: e.target.value as any,
-                  })
-                }
-              ></AvatarPicker>
-            }
-            open={showPicker}
-            onClose={() => setShowPicker(false)}
-          >
-            <div
-              onClick={() => setShowPicker(true)}
-              style={{ cursor: "pointer" }}
-            >
-              <MaskAvatar mask={props.prompt.role} />
-            </div>
-          </Popover>
-
-          <Popover
-            content={
-              <AvatarPicker
-                onEmojiClick={(emoji) => {
-                  props.updateMask((mask) => (mask.avatar = emoji));
-                  setShowPicker(false);
-                }}
-              ></AvatarPicker>
-            }
-            open={showPicker}
-            onClose={() => setShowPicker(false)}
-          >
-            <div
-              onClick={() => setShowPicker(true)}
-              style={{ cursor: "pointer" }}
-            >
-              <MaskAvatar mask={props.mask} />
-            </div>
-          </Popover> */}
-
-          {/* <Select
-          value={props.prompt.role}
-          className={chatStyle["context-role"]}
-          onChange={(e) =>
-            props.update({
-              ...props.prompt,
-              role: e.target.value as any,
-            })
-          }
-        >
-          {ROLES.map((r) => (
-            <option key={r} value={r}>
-              {r}
-            </option>
-          ))}
-        </Select> */}
         </ListItem>
         <ListItem title={Locale.Mask.Config.Name}>
           <input
@@ -362,10 +293,11 @@ export function ContextPrompts(props: {
   updateRole: (updater: (rolearr: newRole[]) => void) => void;
 }) {
   // console.log('qqqq我的侧啊哈',props)
+
   const context = props.context;
   const rolearr = props.rolearr;
   const addContextRole = (prompt: newRole) => {
-    console.log("我的侧啊哈", prompt, rolearr, props);
+    // console.log('我的侧啊哈',prompt,rolearr,props)
     props.updateRole((rolearr) => rolearr.push(prompt));
   };
   const removeContextRole = (i: number) => {
@@ -387,7 +319,6 @@ export function ContextPrompts(props: {
   const updateContextPrompt = (i: number, prompt: ChatMessage) => {
     props.updateContext((context) => (context[i] = prompt));
   };
-
   return (
     <>
       <div className={chatStyle["context-prompt"]} style={{ marginBottom: 20 }}>
@@ -420,6 +351,9 @@ export function ContextPrompts(props: {
       {/* 新增角色 */}
 
       <div className={chatStyle["context-prompt"]} style={{ marginBottom: 20 }}>
+        <div className={chatStyle["meet-tit"]}>
+          参会人信息 <i>*</i>
+        </div>
         {rolearr?.map((c, i) => (
           <ContextRoleItem
             key={i}
@@ -431,7 +365,7 @@ export function ContextPrompts(props: {
 
         <IconButton
           icon={<AddIcon />}
-          text={Locale.Context.newRole}
+          text={"添加参会人"}
           bordered
           className={chatStyle["context-prompt-button"]}
           onClick={() =>
@@ -658,17 +592,6 @@ export function MaskPage() {
                     `${editingMask.name}.json`,
                   )
                 }
-              />,
-              <IconButton
-                key="copy"
-                icon={<CopyIcon />}
-                bordered
-                text={Locale.Mask.EditModal.Clone}
-                onClick={() => {
-                  navigate(Path.Masks);
-                  maskStore.create(editingMask);
-                  setEditingMaskId(undefined);
-                }}
               />,
             ]}
           >

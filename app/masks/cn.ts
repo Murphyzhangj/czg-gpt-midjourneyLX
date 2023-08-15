@@ -66,6 +66,48 @@ export const CN_MASKS: BuiltinMask[] = [
     builtin: true,
   },
   {
+    avatar: "1f4bc",
+    name: "AI会议",
+    context: [
+      {
+        role: "user",
+        content:
+          "本次发起一个圆桌会议，请大家根据自己的角色提出想法和意见。以下是本次会议主要讨论的议题",
+        date: "",
+      },
+    ],
+    newRole: [
+      {
+        role: "user",
+        content: "财务总监",
+        date: "",
+      },
+      {
+        role: "user",
+        content: "研发总监",
+        date: "",
+      },
+      {
+        role: "user",
+        content: "总经理",
+        date: "",
+      },
+    ],
+    modelConfig: {
+      roleNumber: 2,
+      model: "gpt-3.5-turbo-16k",
+      temperature: 1,
+      max_tokens: 2000,
+      presence_penalty: 0,
+      sendMemory: true,
+      historyMessageCount: 4,
+      compressMessageLengthThreshold: 1000,
+      // isJourney:false
+    },
+    lang: "cn",
+    builtin: true,
+  },
+  {
     avatar: "1f978",
     name: "机器学习",
     context: [
