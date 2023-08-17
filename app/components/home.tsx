@@ -111,7 +111,7 @@ function Screen() {
   const isAuth = location.pathname === Path.Auth;
   const isMeet = location.pathname === Path.Meetings;
 
-  // console.log('就交卷',location.pathname,Path)
+  console.log("就交卷", location.pathname, Path);
   useEffect(() => {
     loadAsyncGoogleFont();
   }, []);
@@ -135,7 +135,7 @@ function Screen() {
         <>
           {isMeet ? (
             <>
-              <SideBarM className={isHome ? styles["sidebar-show"] : ""} />
+              <SideBarM className={isMeet ? styles["sidebar-show"] : ""} />
             </>
           ) : (
             <>

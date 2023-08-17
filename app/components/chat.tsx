@@ -687,7 +687,7 @@ export function Chat() {
   ) {
     const copiedHello = Object.assign({}, BOT_HELLO);
     if (!accessStore.isAuthorized()) {
-      console.log("啊？");
+      // console.log("啊？");
 
       copiedHello.content = Locale.Error.Unauthorized;
     }

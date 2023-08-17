@@ -18,6 +18,7 @@ export type Mask = {
   modelConfig: ModelConfig;
   lang: Lang;
   builtin: boolean;
+  programme?: boolean;
 };
 
 export const DEFAULT_MASK_STATE = {
@@ -66,8 +67,8 @@ export const useMaskStore = create<MaskStore>()(
           id,
           builtin: false,
         };
-
         set(() => ({ masks }));
+        console.log("打印测试", masks);
 
         return masks[id];
       },

@@ -11,6 +11,9 @@ import CloseIcon from "../icons/close.svg";
 import DeleteIcon from "../icons/delete.svg";
 import EyeIcon from "../icons/eye.svg";
 import CopyIcon from "../icons/copy.svg";
+import Mdelete from "../icons/mdelete.png";
+import Medit from "../icons/medit.png";
+import Madd from "../icons/madd.png";
 
 import { DEFAULT_MASK_AVATAR, Mask, useMaskStore } from "../store/mask";
 import {
@@ -34,7 +37,8 @@ import { ModelConfigList } from "./model-config";
 import { FileName, Path } from "../constant";
 import { BUILTIN_MASK_STORE } from "../masks";
 import { InputRange } from "./input-range";
-
+import Image from "next/image";
+import { showToast } from "./ui-lib";
 export function MaskAvatar(props: { mask: Mask }) {
   return props.mask.avatar !== DEFAULT_MASK_AVATAR ? (
     <Avatar avatar={props.mask.avatar} />
@@ -44,6 +48,7 @@ export function MaskAvatar(props: { mask: Mask }) {
 }
 
 export function MaskConfig(props: {
+  isNew?: boolean;
   mask: Mask;
   updateMask: Updater<Mask>;
   extraListItems?: JSX.Element;
@@ -69,6 +74,7 @@ export function MaskConfig(props: {
   return (
     <>
       <ContextPrompts
+        isNew={props.isNew}
         context={props.mask.context}
         rolearr={props.mask.newRole}
         updateContext={(updater) => {
@@ -82,9 +88,11 @@ export function MaskConfig(props: {
           updater(newRole);
           props.updateMask((mask) => (mask.newRole = newRole));
         }}
+        mask={props.mask}
+        updateMask={props.updateMask}
       />
 
-      <List>
+      {/* <List>
         {props.mask?.newRole?.length > 0 ? (
           <ListItem
             title={Locale.Mask.Role.name}
@@ -94,7 +102,7 @@ export function MaskConfig(props: {
               title={props.mask.modelConfig.roleNumber.toString()}
               value={props.mask.modelConfig.roleNumber}
               min="1"
-              max="10"
+              max="4"
               step="1"
               onChange={(e) =>
                 updateConfig(
@@ -195,7 +203,7 @@ export function MaskConfig(props: {
           updateConfig={updateConfig}
         />
         {props.extraListItems}
-      </List>
+      </List> */}
     </>
   );
 }
@@ -204,7 +212,19 @@ function ContextPromptItem(props: {
   prompt: ChatMessage;
   update: (prompt: ChatMessage) => void;
   remove: () => void;
+  mask: Mask;
+  updateMask: Updater<Mask>;
 }) {
+  const updateConfig = (updater: (config: ModelConfig) => void) => {
+    const config = { ...props.mask.modelConfig };
+    updater(config);
+    props.updateMask((mask) => {
+      mask.modelConfig = config;
+      // if user changed current session mask, it will disable auto sync
+      mask.syncGlobalConfig = false;
+    });
+  };
+  console.log("测试", props);
   return (
     <div>
       <div className={chatStyle["meet-tit"]}>
@@ -217,12 +237,15 @@ function ContextPromptItem(props: {
           className={chatStyle["context-content"]}
           placeholder="请输入会议主题"
           rows={1}
-          onInput={(e) =>
+          onInput={(e) => {
             props.update({
               ...props.prompt,
               content: e.currentTarget.value as any,
-            })
-          }
+            });
+            props.updateMask((mask) => {
+              mask.name = e.currentTarget.value;
+            });
+          }}
         />
       </div>
 
@@ -230,19 +253,48 @@ function ContextPromptItem(props: {
         会议轮数 <i>*</i>
       </div>
       <div className={chatStyle["context-prompt-row"]}>
-        <Input
-          value={props.prompt.content}
-          type="number"
-          className={chatStyle["context-content"]}
-          placeholder="请输入会议轮数(此设置仅影响每个身份的发言次数)"
-          rows={1}
-          onInput={(e) =>
-            props.update({
-              ...props.prompt,
-              content: e.currentTarget.value as any,
-            })
+        <InputRange
+          title={props.mask.modelConfig.roleNumber.toString()}
+          value={props.mask.modelConfig.roleNumber}
+          min="1"
+          max="4"
+          step="1"
+          className={chatStyle["input-mrange"]}
+          onChange={(e) =>
+            updateConfig(
+              (config) => (config.roleNumber = e.target.valueAsNumber),
+            )
           }
-        />
+        ></InputRange>
+        {/* <Input
+            value={props.prompt.content}
+            type="number"
+            className={chatStyle["context-content"]}
+            placeholder="请输入会议轮数(此设置仅影响每个身份的发言次数)"
+            rows={1}
+            onInput={(e) =>
+              props.update({
+                ...props.prompt,
+                content: e.currentTarget.value as any,
+              })
+            }
+          /> */}
+      </div>
+
+      <div className={chatStyle["context-prompt-row"]}>
+        <div className={chatStyle["meet-tit"]}>
+          {" "}
+          是否生成执行方案<i>*</i>
+        </div>
+        <input
+          type="checkbox"
+          checked={props.mask.programme}
+          onChange={(e) => {
+            props.updateMask((mask) => {
+              mask.programme = e.currentTarget.checked;
+            });
+          }}
+        ></input>
       </div>
     </div>
   );
@@ -252,23 +304,47 @@ export function ContextRoleItem(props: {
   prompt: newRole;
   update: (prompt: newRole) => void;
   remove: () => void;
+  setShowMeet: (_: boolean) => void;
+  setShowMeetadd: (_: boolean) => void;
+  num: number;
+  setEditNum: (_: number) => void;
 }) {
-  const [showPicker, setShowPicker] = useState(false);
-
   return (
-    <div>
-      <List>
-        <ListItem title={Locale.Mask.Config.Avatar}>
-          <div>
-            <IconButton
-              icon={<DeleteIcon />}
-              className={chatStyle["context-delete-button"]}
-              onClick={() => props.remove()}
-              bordered
-            />
-          </div>
-        </ListItem>
-        <ListItem title={Locale.Mask.Config.Name}>
+    <div className={chatStyle["meet-peo-one"]}>
+      {/* <List> */}
+      <div>
+        <div className={chatStyle["meet-peo-one-set"]}>
+          <Image
+            src={Mdelete.src}
+            onClick={() => props.remove()}
+            width={15}
+            height={15}
+            alt="删除"
+            className={chatStyle["meet-peo-icon"]}
+          />
+          <Image
+            src={Medit.src}
+            onClick={() => {
+              props.setShowMeet(true);
+              props.setShowMeetadd(false);
+              props.setEditNum(props.num);
+            }}
+            width={15}
+            height={15}
+            alt="编辑"
+            className={chatStyle["meet-peo-icon"]}
+          />
+        </div>
+        <div className={chatStyle["meet-peo-averter"]}>
+          {props.prompt.content.slice(0, 1)}
+        </div>
+
+        <div className={chatStyle["meet-peo-nickname"]}>
+          {props.prompt.content}
+        </div>
+      </div>
+
+      {/* <ListItem title={Locale.Mask.Config.Name}>
           <input
             type="text"
             value={props.prompt.content}
@@ -280,18 +356,133 @@ export function ContextRoleItem(props: {
               })
             }
           ></input>
-        </ListItem>
-      </List>
+        </ListItem> */}
+      {/* </List> */}
+    </div>
+  );
+}
+function AddMeetPeo(props: {
+  isNew?: boolean;
+  operatenum: number;
+  prompt: object;
+  rolearr: newRole[];
+  setShowMeet: (_: boolean) => void;
+  updateRole: (updater: (rolearr: newRole[]) => void) => void;
+  // updateRole: (updater: (rolearr: newRole[]) => void) => void;
+}) {
+  let rolearr = props.rolearr;
+  console.log("我的侧啊哈", props);
+  const addContextRole = (prompt: newRole) => {
+    // console.log('我的侧啊哈',prompt,rolearr,props)
+    props.updateRole((rolearr) => rolearr.push(prompt));
+  };
+  const removeContextRole = (i: number) => {
+    props.updateRole((rolearr) => rolearr.splice(i, 1));
+  };
+  const updateContextRole = (i: number, prompt: newRole) => {
+    props.updateRole((rolearr) => (rolearr[i] = prompt));
+    // console.log('输入的时候角色更新',props)
+  };
+
+  return (
+    <div className="modal-mask">
+      <Modal
+        title="新建参会人"
+        onClose={() => {
+          if (props.isNew) {
+            removeContextRole(rolearr.length - 1);
+          }
+          props.setShowMeet(false);
+        }}
+        actions={[
+          <IconButton
+            key="reset"
+            bordered
+            text="保存"
+            onClick={() => {
+              if (rolearr[props.operatenum].content == "")
+                return showToast("请输入参会人岗位");
+              props.setShowMeet(false);
+            }}
+          />,
+        ]}
+      >
+        <div
+          className={chatStyle["context-prompt"]}
+          style={{ marginBottom: 20 }}
+        >
+          <div className={chatStyle["meet-tit"]}>
+            参会人岗位 <i>*</i>
+          </div>
+          <div className={chatStyle["context-prompt-row"]}>
+            <Input
+              value={rolearr[props.operatenum].content}
+              type="text"
+              className={chatStyle["context-content"]}
+              placeholder="请输入参会人岗位"
+              maxLength={6}
+              rows={1}
+              onInput={
+                (e) => {
+                  rolearr[props.operatenum].content = e.currentTarget
+                    .value as any;
+                  // if(rolearr[props.operatenum].content.length<6){
+
+                  updateContextRole(
+                    props.operatenum,
+                    rolearr[props.operatenum],
+                  );
+                  // }
+                }
+                // props.update({
+                //   ...props.prompt,
+                //   content: e.currentTarget.value as any,
+                // })
+              }
+            />
+          </div>
+
+          <div className={chatStyle["meet-tit"]}>岗位描述 </div>
+          <div className={chatStyle["context-prompt-row"]}>
+            <Input
+              value={rolearr[props.operatenum].date}
+              type="number"
+              className={chatStyle["context-content"]}
+              placeholder="请输入岗位描述"
+              rows={1}
+              onInput={(e) => {
+                rolearr[props.operatenum].date = e.currentTarget.value as any;
+                updateContextRole(props.operatenum, rolearr[props.operatenum]);
+              }}
+            />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
 
 export function ContextPrompts(props: {
+  isNew?: boolean;
   context: ChatMessage[];
   updateContext: (updater: (context: ChatMessage[]) => void) => void;
   rolearr: newRole[];
   updateRole: (updater: (rolearr: newRole[]) => void) => void;
+  mask: Mask;
+  updateMask: Updater<Mask>;
 }) {
+  const updateConfig = (updater: (config: ModelConfig) => void) => {
+    const config = { ...props.mask.modelConfig };
+    updater(config);
+    props.updateMask((mask) => {
+      mask.modelConfig = config;
+      // if user changed current session mask, it will disable auto sync
+      mask.syncGlobalConfig = false;
+    });
+  };
+  const [showMeet, setShowMeet] = useState(false);
+  const [showMeetadd, setShowMeetadd] = useState(false);
+  const [editNum, setEditNum] = useState(0);
   // console.log('qqqq我的侧啊哈',props)
 
   const context = props.context;
@@ -317,6 +508,7 @@ export function ContextPrompts(props: {
   };
 
   const updateContextPrompt = (i: number, prompt: ChatMessage) => {
+    console.log("ceshi");
     props.updateContext((context) => (context[i] = prompt));
   };
   return (
@@ -328,10 +520,12 @@ export function ContextPrompts(props: {
             prompt={c}
             update={(prompt) => updateContextPrompt(i, prompt)}
             remove={() => removeContextPrompt(i)}
+            mask={props.mask}
+            updateMask={props.updateMask}
           />
         ))}
 
-        <div className={chatStyle["context-prompt-row"]}>
+        {/* <div className={chatStyle["context-prompt-row"]}>
           <IconButton
             icon={<AddIcon />}
             text={Locale.Context.Add}
@@ -345,7 +539,7 @@ export function ContextPrompts(props: {
               })
             }
           />
-        </div>
+        </div> */}
       </div>
 
       {/* 新增角色 */}
@@ -354,18 +548,59 @@ export function ContextPrompts(props: {
         <div className={chatStyle["meet-tit"]}>
           参会人信息 <i>*</i>
         </div>
-        {rolearr?.map((c, i) => (
-          <ContextRoleItem
-            key={i}
-            prompt={c}
-            update={(prompt) => updateContextRole(i, prompt)}
-            remove={() => removeContextRole(i)}
-          />
-        ))}
+        <div className={chatStyle["meet-peo"]}>
+          {rolearr?.map((c, i) => (
+            <ContextRoleItem
+              key={i}
+              prompt={c}
+              update={(prompt) => updateContextRole(i, prompt)}
+              remove={() => removeContextRole(i)}
+              setShowMeet={setShowMeet}
+              setShowMeetadd={setShowMeetadd}
+              num={i}
+              setEditNum={setEditNum}
+            />
+          ))}
+          <div
+            className={chatStyle["meet-peo-add"]}
+            onClick={() => {
+              addContextRole({
+                role: "user",
+                content: "",
+                date: "",
+              });
+              setEditNum(rolearr.length);
+              setShowMeet(true);
+              setShowMeetadd(true);
+            }}
+          >
+            <div>
+              <div className={chatStyle["meet-peo-addcenter"]}>
+                <Image src={Madd.src} width={30} height={30} alt="添加参会人" />
+              </div>
+              <div>添加参会人</div>
+            </div>
+          </div>
 
-        <IconButton
+          {showMeet && (
+            <AddMeetPeo
+              prompt={{
+                role: "user",
+                content: "",
+                date: "",
+              }}
+              operatenum={editNum}
+              rolearr={rolearr}
+              setShowMeet={setShowMeet}
+              updateRole={props.updateRole}
+              isNew={showMeetadd}
+            ></AddMeetPeo>
+          )}
+        </div>
+
+        {/* <IconButton
           icon={<AddIcon />}
-          text={"添加参会人"}
+          text={'添加参会人'}
           bordered
           className={chatStyle["context-prompt-button"]}
           onClick={() =>
@@ -375,7 +610,7 @@ export function ContextPrompts(props: {
               date: "",
             })
           }
-        />
+        /> */}
       </div>
     </>
   );
@@ -507,7 +742,7 @@ export function MaskPage() {
               ))}
             </Select>
 
-            <IconButton
+            {/* <IconButton
               className={styles["mask-create"]}
               icon={<AddIcon />}
               text={Locale.Mask.Page.Create}
@@ -516,7 +751,7 @@ export function MaskPage() {
                 const createdMask = maskStore.create();
                 setEditingMaskId(createdMask.id);
               }}
-            />
+            /> */}
           </div>
 
           <div>

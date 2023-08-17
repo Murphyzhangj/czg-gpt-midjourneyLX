@@ -50,7 +50,7 @@ import { Prompt, usePromptStore } from "../store/prompt";
 import Locale from "../locales";
 
 import { IconButton } from "./button";
-import styles from "./home.module.scss";
+import styles from "./mhome.module.scss";
 import chatStyle from "./chat.module.scss";
 
 import { ListItem, Modal } from "./meet-ui-lib";
@@ -674,7 +674,7 @@ export function Chat() {
   ) {
     const copiedHello = Object.assign({}, BOT_HELLO);
     if (!accessStore.isAuthorized()) {
-      console.log("啊？");
+      // console.log("啊？");
 
       copiedHello.content = Locale.Error.Unauthorized;
     }
@@ -742,9 +742,10 @@ export function Chat() {
       chatStore.fetchMidjourneyStatus(msg);
     }
   });
+  // console.log('seeions',session,DEFAULT_TOPIC)
   return (
     <div className={styles.chat} key={session.id}>
-      <div className="window-header">
+      <div className={`window-header " ${styles["meet-header"]}`}>
         <div className="window-header-title">
           <div
             className={`window-header-main-title " ${styles["chat-body-title"]}`}
@@ -752,12 +753,20 @@ export function Chat() {
           >
             {!session.topic ? DEFAULT_TOPIC : session.topic}
           </div>
-          <div className="window-header-sub-title">
+          {/* <div className="window-header-sub-title">
             {Locale.Chat.SubTitle(session.messages.length)}
-          </div>
+          </div> */}
         </div>
         <div className="window-actions">
-          <div className={"window-action-button" + " " + styles.mobile}>
+          <div className={"window-action-button " + styles.mobile}>
+            <IconButton
+              icon={<ReturnIcon />}
+              bordered
+              title={Locale.Chat.Actions.ChatList}
+              onClick={() => navigate(Path.Meetings)}
+            />
+          </div>
+          {/* <div className={"window-action-button" + " " + styles.mobile}>
             <IconButton
               icon={<ReturnIcon />}
               bordered
@@ -782,6 +791,7 @@ export function Chat() {
               }}
             />
           </div>
+          
           {!isMobileScreen && (
             <div className="window-action-button">
               <IconButton
@@ -794,14 +804,23 @@ export function Chat() {
                 }}
               />
             </div>
-          )}
+          )} */}
+
+          {/* <div className="window-action-button">
+            <button
+              onClick={() =>{}}
+              className={`${styles["chat-message-action-btn"]} clickable`}
+            >
+              重新发言
+            </button>
+          </div> */}
         </div>
 
-        <PromptToast
+        {/* <PromptToast
           showToast={!hitBottom}
           showModal={showPromptModal}
           setShowModal={setShowPromptModal}
-        />
+        /> */}
       </div>
 
       <div

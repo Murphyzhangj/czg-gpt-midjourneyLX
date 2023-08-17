@@ -76,11 +76,14 @@ export function SessionConfigModel(props: {
             bordered
             text="开始会议"
             onClick={() => {
-              if (confirm(Locale.Memory.ResetConfirm)) {
-                chatStore.updateCurrentSession(
-                  (session) => (session.memoryPrompt = ""),
-                );
-              }
+              chatStore.newSession(props.editingMask);
+              props.onClose();
+              console.log("nkkhh", props.editingMask);
+              // if (confirm(Locale.Memory.ResetConfirm)) {
+              //   chatStore.updateCurrentSession(
+              //     (session) => (session.memoryPrompt = ""),
+              //   );
+              // }
             }}
           />,
         ]}
@@ -89,6 +92,7 @@ export function SessionConfigModel(props: {
           <>
             <MaskConfig
               mask={props.editingMask}
+              isNew={true}
               updateMask={(updater) =>
                 maskStore.update(props.editingMask.id!, updater)
               }
@@ -259,8 +263,17 @@ export function SideBarM(props: { className?: string }) {
           onClick={() => {
             flagNew = true;
             setShowPromptModal(true);
-            const createdMask = maskStore.create();
+            const createdMask = maskStore.create({
+              context: [
+                {
+                  role: "user",
+                  content: "",
+                  date: "",
+                },
+              ],
+            });
             setEditingMaskId(createdMask.id);
+            console.log("测试时", createdMask);
           }}
           shadow
         />

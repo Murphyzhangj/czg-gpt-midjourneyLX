@@ -360,7 +360,7 @@ export const useChatStore = create<ChatStore>()(
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
         const messages = session.messages;
-        // console.log('打印新函数',session)
+        console.log("打印新函数", session, index, get().roleIdx);
 
         let topicMessages = messages;
         if (session?.mask?.newRole?.length > 0) {
@@ -374,7 +374,7 @@ export const useChatStore = create<ChatStore>()(
           //   get().roleIdx == index,
           // );
 
-          if (get().roleIdx == index) {
+          if (get().roleIdx == index || get().roleIdx == index - 1) {
             // topicMessages.concat(
             //   createMessage({
             //     role: "user",
@@ -384,6 +384,8 @@ export const useChatStore = create<ChatStore>()(
             let content;
             if (index == session.mask.newRole?.length) {
               content = Locale.Mask.Role.secretary;
+            } else if (index == session.mask.newRole?.length + 1) {
+              content = "请根据上述内容生成一份详细的执行计划时间表";
             } else {
               // content = `作为${
               //   session.mask.newRole[index].content
@@ -468,8 +470,14 @@ export const useChatStore = create<ChatStore>()(
                       roundRole: 1,
                     }));
                   }
-
+                  // console.log('小秘书结束了吗',index,get().roundRole)
                   get().doSelf(get().roleIdx);
+                } else if (
+                  index == session.mask.newRole?.length &&
+                  session.mask?.programme
+                ) {
+                  console.log("小秘书结束了吗1111", index, get().roundRole);
+                  get().doSelf(get().roleIdx + 1);
                 }
               },
               onError(error) {

@@ -65,7 +65,7 @@ export function MaskConfig(props: {
   };
 
   const globalConfig = useAppConfig();
-  console.log("测试一下", props.mask);
+  // console.log("测试一下", props.mask);
   return (
     <>
       <ContextPrompts
@@ -365,7 +365,7 @@ export function ContextPrompts(props: {
   const context = props.context;
   const rolearr = props.rolearr;
   const addContextRole = (prompt: newRole) => {
-    console.log("我的侧啊哈", prompt, rolearr, props);
+    // console.log("我的侧啊哈", prompt, rolearr, props);
     props.updateRole((rolearr) => rolearr.push(prompt));
   };
   const removeContextRole = (i: number) => {
@@ -606,6 +606,7 @@ export function MaskPage() {
                     icon={<AddIcon />}
                     text={Locale.Mask.Item.Chat}
                     onClick={() => {
+                      console.log("kjjkjkj", m);
                       chatStore.newSession(m);
                       navigate(Path.Chat);
                     }}

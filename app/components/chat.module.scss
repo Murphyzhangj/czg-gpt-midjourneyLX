@@ -11,6 +11,64 @@
     top: 3px;
   }
 }
+.meet-peo{
+  display: flex;
+  flex-wrap: wrap;
+
+  .meet-peo-one{
+    border: var(--border-in-light);
+    border-radius: 6px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 20px;
+    animation: slide-in ease 0.3s;
+    width: 115px;
+    height: 125px;
+    margin-right: 15px;
+    .meet-peo-one-set{
+      text-align: right;
+      // display: flex;
+      .meet-peo-icon{
+        margin-right: 10px;
+      }
+      .meet-peo-icon:last-child{
+        margin-right: 7px;
+      }
+    }
+    .meet-peo-averter{
+      border: var(--border-in-light);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      margin: auto;
+      font-size: 21px;
+      text-align: center;
+      line-height: 60px;
+    }
+    .meet-peo-nickname{
+      text-align: center;
+      padding-top: 2px;
+    }
+  }
+  .meet-peo-add{
+    border: var(--border-in-light);
+    border-radius: 6px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 20px;
+    animation: slide-in ease 0.3s;
+    width: 115px;
+    height: 125px;
+    margin-right: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .meet-peo-addcenter{
+      text-align: center;
+    }
+  }
+
+}
+
+
 .chat-input-actions {
   display: flex;
   flex-wrap: wrap;
@@ -84,6 +142,15 @@
     justify-content: center;
     width: 100%;
     margin-bottom: 10px;
+
+    
+  .input-mrange{
+    max-width: 100%;
+    width: 100%;
+    input[type="range"] {
+      width: 100%;
+    }
+  }
 
     .context-role {
       margin-right: 10px;
