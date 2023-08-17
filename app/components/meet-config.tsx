@@ -281,13 +281,12 @@ function ContextPromptItem(props: {
           /> */}
       </div>
 
-      <div className={chatStyle["context-prompt-row"]}>
-        <div className={chatStyle["meet-tit"]}>
-          {" "}
-          是否生成执行方案<i>*</i>
-        </div>
+      <div className={chatStyle["meet-tit"]}>
+        {" "}
+        是否生成执行方案<i>*</i>
         <input
           type="checkbox"
+          className={chatStyle["meet-checkbox"]}
           checked={props.mask.programme}
           onChange={(e) => {
             props.updateMask((mask) => {
@@ -295,6 +294,9 @@ function ContextPromptItem(props: {
             });
           }}
         ></input>
+        <div className={chatStyle["meet-tip"]}>
+          {props.mask.programme ? "开启" : "关闭"}
+        </div>
       </div>
     </div>
   );

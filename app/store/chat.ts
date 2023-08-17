@@ -374,7 +374,10 @@ export const useChatStore = create<ChatStore>()(
           //   get().roleIdx == index,
           // );
 
-          if (get().roleIdx == index || get().roleIdx == index - 1) {
+          if (
+            get().roleIdx == index ||
+            (get().roleIdx == index - 1 && session.mask?.programme)
+          ) {
             // topicMessages.concat(
             //   createMessage({
             //     role: "user",
