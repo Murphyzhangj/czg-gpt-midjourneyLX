@@ -5,6 +5,7 @@ require("../polyfill");
 import { useState, useEffect } from "react";
 
 import styles from "./home.module.scss";
+import mstyles from "./mhome.module.scss";
 
 import BotIcon from "../icons/bot.svg";
 import LoadingIcon from "../icons/three-dots.svg";
@@ -110,8 +111,8 @@ function Screen() {
   const isMobileScreen = useMobileScreen();
   const isAuth = location.pathname === Path.Auth;
   const isMeet = location.pathname === Path.Meetings;
-
-  console.log("就交卷", location.pathname, Path);
+  const search = location.search === "?foo=true";
+  console.log("就交卷", location.pathname, Path, isMeet, location);
   useEffect(() => {
     loadAsyncGoogleFont();
   }, []);
@@ -135,7 +136,7 @@ function Screen() {
         <>
           {isMeet ? (
             <>
-              <SideBarM className={isMeet ? styles["sidebar-show"] : ""} />
+              <SideBarM className={search ? mstyles["sidebar-show"] : ""} />
             </>
           ) : (
             <>

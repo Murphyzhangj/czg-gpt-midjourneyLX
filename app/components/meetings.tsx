@@ -763,7 +763,7 @@ export function Chat() {
               icon={<ReturnIcon />}
               bordered
               title={Locale.Chat.Actions.ChatList}
-              onClick={() => navigate(Path.Meetings)}
+              onClick={() => navigate(Path.Meetings + "?foo=true")}
             />
           </div>
           {/* <div className={"window-action-button" + " " + styles.mobile}>
