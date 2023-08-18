@@ -130,7 +130,7 @@ function PromptToast(props: {
 
   return (
     <div className={chatStyle["prompt-toast"]} key="prompt-toast">
-      {props.showToast && (
+      {/* {props.showToast && (
         <div
           className={chatStyle["prompt-toast-inner"] + " clickable"}
           role="button"
@@ -141,7 +141,7 @@ function PromptToast(props: {
             {Locale.Context.Toast(context.length)}
           </span>
         </div>
-      )}
+      )} */}
       {props.showModal && (
         <SessionConfigModel onClose={() => props.setShowModal(false)} />
       )}
@@ -816,11 +816,11 @@ export function Chat() {
           </div> */}
         </div>
 
-        {/* <PromptToast
+        <PromptToast
           showToast={!hitBottom}
           showModal={showPromptModal}
           setShowModal={setShowPromptModal}
-        /> */}
+        />
       </div>
 
       <div
