@@ -224,7 +224,7 @@ function ContextPromptItem(props: {
       mask.syncGlobalConfig = false;
     });
   };
-  console.log("测试", props);
+  // console.log("测试", props);
   return (
     <div>
       <div className={chatStyle["meet-tit"]}>
@@ -373,7 +373,7 @@ function AddMeetPeo(props: {
   // updateRole: (updater: (rolearr: newRole[]) => void) => void;
 }) {
   let rolearr = props.rolearr;
-  console.log("我的侧啊哈", props);
+  // console.log("我的侧啊哈", props);
   const addContextRole = (prompt: newRole) => {
     // console.log('我的侧啊哈',prompt,rolearr,props)
     props.updateRole((rolearr) => rolearr.push(prompt));
@@ -510,7 +510,7 @@ export function ContextPrompts(props: {
   };
 
   const updateContextPrompt = (i: number, prompt: ChatMessage) => {
-    console.log("ceshi");
+    // console.log("ceshi");
     props.updateContext((context) => (context[i] = prompt));
   };
   return (
@@ -648,7 +648,7 @@ export function MaskPage() {
   const [editingMaskId, setEditingMaskId] = useState<number | undefined>();
   const editingMask =
     maskStore.get(editingMaskId) ?? BUILTIN_MASK_STORE.get(editingMaskId);
-  console.log("打印一下", editingMask);
+  // console.log("打印一下", editingMask);
   const closeMaskModal = () => setEditingMaskId(undefined);
 
   const downloadAll = () => {

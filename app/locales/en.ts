@@ -298,7 +298,7 @@ const en: RequiredLocaleType = {
       SubTitle: "每个角色的对话次数",
       place: "请输入角色名称",
       description: (count: number, name: string) =>
-        `作为${name}角色对上述对话进行第${count}轮发言，并总结`,
+        `作为${name}角色对上述对话进行第${count}轮发言`,
       secretary: "你是一个会议秘书，请为以上圆桌会议内容进行总结，简明扼要",
     },
   },

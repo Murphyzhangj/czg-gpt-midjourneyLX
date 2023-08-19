@@ -78,7 +78,7 @@ export function SessionConfigModel(props: {
             onClick={() => {
               chatStore.newSession(props.editingMask);
               props.onClose();
-              console.log("nkkhh", props.editingMask);
+              // console.log("nkkhh", props.editingMask);
               // if (confirm(Locale.Memory.ResetConfirm)) {
               //   chatStore.updateCurrentSession(
               //     (session) => (session.memoryPrompt = ""),
@@ -252,7 +252,7 @@ export function SideBarM(props: { className?: string }) {
             className="user-avatar"
           />
         </div>
-        <div className={styles["sidebar-title"]}>车之谷 AutoProAdviser</div>
+        <div className={styles["sidebar-title"]}>叆谷 Cloud Love Valley</div>
       </div>
 
       <div className={styles["sidebar-header-bar"]}>
@@ -273,7 +273,7 @@ export function SideBarM(props: { className?: string }) {
               ],
             });
             setEditingMaskId(createdMask.id);
-            console.log("测试时", createdMask);
+            // console.log("测试时", createdMask);
           }}
           shadow
         />

@@ -112,7 +112,7 @@ function Screen() {
   const isAuth = location.pathname === Path.Auth;
   const isMeet = location.pathname === Path.Meetings;
   const search = location.search === "?foo=true";
-  console.log("就交卷", location.pathname, Path, isMeet, location);
+  // console.log("就交卷", location.pathname, Path, isMeet, location);
   useEffect(() => {
     loadAsyncGoogleFont();
   }, []);
