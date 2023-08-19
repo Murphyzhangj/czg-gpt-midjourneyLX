@@ -269,6 +269,7 @@ export function SideBarM(props: { className?: string }) {
                   role: "user",
                   content: "",
                   date: "",
+                  model: "gpt-3.5-turbo-16k",
                 },
               ],
             });
