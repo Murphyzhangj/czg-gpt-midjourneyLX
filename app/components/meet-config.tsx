@@ -244,6 +244,7 @@ function ContextPromptItem(props: {
             });
             props.updateMask((mask) => {
               mask.name = e.currentTarget.value;
+              mask.hideContext = true;
             });
           }}
         />

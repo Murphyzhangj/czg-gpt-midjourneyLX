@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 
 import styles from "./slidebarM.module.scss";
 import chatStyle from "./chat.module.scss";
@@ -54,6 +54,29 @@ function useHotKey() {
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 }
+function useScrollToBottom() {
+  // for auto-scroll
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [autoScroll, setAutoScroll] = useState(true);
+  const scrollToBottom = () => {
+    const dom = scrollRef.current;
+    if (dom) {
+      setTimeout(() => (dom.scrollTop = dom.scrollHeight), 1);
+    }
+  };
+
+  // auto scroll
+  useLayoutEffect(() => {
+    autoScroll && scrollToBottom();
+  });
+
+  return {
+    scrollRef,
+    autoScroll,
+    setAutoScroll,
+    scrollToBottom,
+  };
+}
 export function SessionConfigModel(props: {
   onClose: () => void;
   isNew: boolean;
@@ -63,7 +86,8 @@ export function SessionConfigModel(props: {
   const session = chatStore.currentSession();
   const maskStore = useMaskStore();
   const navigate = useNavigate();
-
+  const { scrollRef, setAutoScroll, scrollToBottom } = useScrollToBottom();
+  const [isLoading, setIsLoading] = useState(false);
   return (
     <div className="modal-mask">
       <Modal
@@ -76,9 +100,26 @@ export function SessionConfigModel(props: {
             bordered
             text="开始会议"
             onClick={() => {
-              chatStore.newSession(props.editingMask);
-              props.onClose();
-              // console.log("nkkhh", props.editingMask);
+              console.log("nkkhh", props.editingMask);
+              if (props.editingMask.context[0].content == "") {
+                return showToast("请输入会议主题");
+              } else if (props.editingMask.newRole.length < 1) {
+                return showToast("请添加参会人信息");
+              } else {
+                chatStore.newSession(props.editingMask);
+                setIsLoading(true);
+                chatStore
+                  .onUserInput(
+                    Locale.Context.Supplay +
+                      props.editingMask.context[0].content,
+                    {
+                      setAutoScroll,
+                    },
+                  )
+                  .then(() => setIsLoading(false));
+                props.onClose();
+              }
+
               // if (confirm(Locale.Memory.ResetConfirm)) {
               //   chatStore.updateCurrentSession(
               //     (session) => (session.memoryPrompt = ""),

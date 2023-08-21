@@ -667,6 +667,7 @@ export function Chat() {
     setIsLoading(true);
     const content = session.messages[userIndex].content;
     deleteMessage(userIndex);
+    console.log("重试", botMessageId, session.messages[userIndex]);
     chatStore
       .onUserInput(content, {
         setAutoScroll,

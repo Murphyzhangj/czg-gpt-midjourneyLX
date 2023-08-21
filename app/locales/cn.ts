@@ -252,6 +252,7 @@ const cn = {
     newRole: "新增角色",
     AddMeet: "新建AI会议",
     EditMeet: "编辑当前AI会议",
+    Supplay: "召开一次圆桌会议，请大家根据会议主题依次发言。主题是：",
   },
   Plugin: {
     Name: "插件",

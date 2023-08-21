@@ -128,7 +128,7 @@ export const ALL_MODELS = [
   },
   {
     name: "midjourney", // midjourney
-    available: true,
+    available: false,
   },
 ] as const;
 
@@ -196,7 +196,7 @@ export const useAppConfig = create<ChatConfigStore>()(
         state.modelConfig.compressMessageLengthThreshold = 1000;
         state.dontShowMaskSplashScreen = false;
         // state.modelConfig.isJourney = false;
-
+        console.log("打印一下", state);
         return state;
       },
     },
