@@ -247,6 +247,8 @@ const en: RequiredLocaleType = {
     newRole: "AddRole",
     AddMeet: "AddAImeet",
     EditMeet: "EditAImeet",
+    Supplay:
+      "Hold a round table meeting and ask everyone to speak according to the theme of the meeting. The theme is:",
   },
   Plugin: {
     Name: "Plugin",
