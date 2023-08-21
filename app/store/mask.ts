@@ -19,6 +19,7 @@ export type Mask = {
   lang: Lang;
   builtin: boolean;
   programme?: boolean;
+  flag?: boolean;
 };
 
 export const DEFAULT_MASK_STATE = {

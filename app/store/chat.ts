@@ -6,7 +6,7 @@ import { trimTopic } from "../utils";
 import Locale from "../locales";
 import { showToast } from "../components/ui-lib";
 import { ModelType } from "./config";
-import { createEmptyMask, Mask } from "./mask";
+import { createEmptyMask, Mask, useMaskStore } from "./mask";
 import { StoreKey } from "../constant";
 import {
   api,
@@ -23,6 +23,7 @@ export type ChatMessage = RequestMessage & {
   isError?: boolean;
   id?: number;
   model?: ModelType;
+  flag?: boolean;
   attr?: any;
 };
 export type newRole = RequestMessage & {
@@ -40,6 +41,7 @@ export function createMessage(override: Partial<ChatMessage>): ChatMessage {
     role: "user",
     content: "",
     attr: {},
+    flag: true,
     ...override,
   };
 }
@@ -60,7 +62,6 @@ export interface ChatSession {
   lastUpdate: number;
   lastSummarizeIndex: number;
   clearContextIndex?: number;
-
   mask: Mask;
 }
 
@@ -96,6 +97,7 @@ interface ChatStore {
   globalId: number;
   roleIdx: number; //循环到了数组的第几个
   roundRole: number; //对话轮数
+  isStop?: boolean;
   clearSessions: () => void;
   doSelf: (index: number) => void;
   moveSession: (from: number, to: number) => void;
@@ -478,12 +480,11 @@ export const useChatStore = create<ChatStore>()(
                   }
                   // console.log('小秘书结束了吗',index,get().roundRole)
                   get().doSelf(get().roleIdx);
-                } else if (
-                  index == session.mask.newRole?.length &&
-                  session.mask?.programme
-                ) {
-                  // console.log("小秘书结束了吗1111", index, get().roundRole);
-                  get().doSelf(get().roleIdx + 1);
+                } else {
+                  get().updateCurrentSession((session) => {
+                    session.mask.flag = true;
+                  });
+                  console.log("小秘书结束了吗1111", index, get().roundRole);
                 }
               },
               onError(error) {
@@ -529,6 +530,7 @@ export const useChatStore = create<ChatStore>()(
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
+        console.log("cehkh", session);
         if (
           extAttr?.mjImageMode &&
           (extAttr?.useImages?.length ?? 0) > 0 &&
@@ -560,6 +562,7 @@ export const useChatStore = create<ChatStore>()(
           streaming: true,
           id: userMessage.id! + 1,
           model: modelConfig.model,
+          flag: true,
         });
 
         const systemInfo = createMessage({
@@ -569,7 +572,6 @@ export const useChatStore = create<ChatStore>()(
           } model, now time is ${new Date().toLocaleString()}}`,
           id: botMessage.id! + 1,
         });
-
         // get recent messages
         const systemMessages = [];
         // if user define a mask with context prompts, wont send system info
@@ -587,20 +589,20 @@ export const useChatStore = create<ChatStore>()(
         // save user's and bot's message
         get().updateCurrentSession((session) => {
           session.messages.push(userMessage);
-          if (session?.mask?.newRole?.length > 0) {
+          if (session?.mask?.newRole?.length > 0 && !session.mask.flag) {
             set(() => ({
               roleIdx: 0,
               roundRole: 1,
+              isStop: true,
             }));
             get().doSelf(0);
             return;
           }
           session.messages.push(botMessage);
         });
-        if (session?.mask?.newRole?.length > 0) {
+        if (session?.mask?.newRole?.length > 0 && !session.mask.flag) {
           return;
         }
-
         // make request
         console.log("[User Input] ", sendMessages);
         if (
@@ -812,11 +814,14 @@ export const useChatStore = create<ChatStore>()(
               );
               set(() => ({}));
               // console.log('消息回复完毕------结束了')
-              set(() => ({
-                roleIdx: 0,
-                roundRole: 1,
-              }));
-              get().doSelf(0);
+
+              if (!session.mask.flag) {
+                set(() => ({
+                  roleIdx: 0,
+                  roundRole: 1,
+                }));
+                get().doSelf(0);
+              }
             },
             onError(error) {
               const isAborted = error.message.includes("aborted");

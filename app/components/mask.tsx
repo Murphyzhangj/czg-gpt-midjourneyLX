@@ -77,7 +77,7 @@ export function MaskConfig(props: {
           props.updateMask((mask) => (mask.context = context));
         }}
         updateRole={(updater) => {
-          console.log("更新测试", props);
+          // console.log("更新测试", props);
           const newRole = props.mask.newRole?.slice();
           updater(newRole);
           props.updateMask((mask) => (mask.newRole = newRole));
@@ -94,7 +94,7 @@ export function MaskConfig(props: {
               title={props.mask.modelConfig.roleNumber.toString()}
               value={props.mask.modelConfig.roleNumber}
               min="1"
-              max="10"
+              max="4"
               step="1"
               onChange={(e) =>
                 updateConfig(
