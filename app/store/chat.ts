@@ -396,6 +396,9 @@ export const useChatStore = create<ChatStore>()(
               content = Locale.Mask.Role.description(
                 get().roundRole,
                 session.mask.newRole[index].content,
+                session.mask.newRole[index].date
+                  ? "," + session.mask.newRole[index].date
+                  : "",
               );
             }
             topicMessages.push(
@@ -479,7 +482,7 @@ export const useChatStore = create<ChatStore>()(
                   index == session.mask.newRole?.length &&
                   session.mask?.programme
                 ) {
-                  console.log("小秘书结束了吗1111", index, get().roundRole);
+                  // console.log("小秘书结束了吗1111", index, get().roundRole);
                   get().doSelf(get().roleIdx + 1);
                 }
               },
