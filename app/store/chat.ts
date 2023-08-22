@@ -358,7 +358,8 @@ export const useChatStore = create<ChatStore>()(
           }
         }, 3000);
       },
-      doSelf(index) {
+      doSelf(idx) {
+        let index = idx;
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
         const messages = session.messages;
@@ -391,6 +392,7 @@ export const useChatStore = create<ChatStore>()(
               content = Locale.Mask.Role.secretary;
             } else if (index == session.mask.newRole?.length + 1) {
               content = "请根据上述内容生成一份详细的执行计划时间表";
+              // index=index-1;
             } else {
               // content = `作为${
               //   session.mask.newRole[index].content
@@ -480,7 +482,15 @@ export const useChatStore = create<ChatStore>()(
                   }
                   // console.log('小秘书结束了吗',index,get().roundRole)
                   get().doSelf(get().roleIdx);
+                  console.log("测试打印", get().roleIdx);
                 } else {
+                  if (session.mask?.programme && !session.mask.flag) {
+                    // set(() => ({
+                    //   roleIdx: index + 1,
+                    //   // roundRole: 1,
+                    // }));
+                    get().doSelf(get().roleIdx + 1);
+                  }
                   get().updateCurrentSession((session) => {
                     session.mask.flag = true;
                   });
