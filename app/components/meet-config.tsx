@@ -299,6 +299,24 @@ function ContextPromptItem(props: {
           {props.mask.programme ? "开启" : "关闭"}
         </div>
       </div>
+
+      {/* <div className={chatStyle["meet-tit"]}>
+        {" "}
+        是否是单轮会议<i>*</i>
+        <input
+          type="checkbox"
+          className={chatStyle["meet-checkbox"]}
+          checked={props.mask.flag}
+          onChange={(e) => {
+            props.updateMask((mask) => {
+              mask.flag = e.currentTarget.checked;
+            });
+          }}
+        ></input>
+        <div className={chatStyle["meet-tip"]}>
+          {props.mask.flag ? "开启" : "关闭"}
+        </div>
+      </div> */}
     </div>
   );
 }

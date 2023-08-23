@@ -605,3 +605,48 @@
   height: 100%;
   width: 100%;
 }
+.chat-message-meeting{
+  display: flex;
+  align-items: center;
+  .chat-message-meeting-avatar{
+    font-weight: bold;
+  }
+  .chat-message-status{
+    margin-top: 0;
+    margin-left: 5px;
+  }
+}
+.chat-message-meeting-rounds{
+  margin: 20px 0 0 0;
+  padding: 4px 0;
+
+  border-top: var(--border-in-light);
+  border-bottom: var(--border-in-light);
+  box-shadow: var(--card-shadow) inset;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  // color: var(--black);
+  transition: all ease 0.3s;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  font-size: 12px;
+
+  animation: slide-in ease 0.3s;
+
+  $linear: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 1),
+    rgba(0, 0, 0, 0)
+  );
+  mask-image: $linear;
+  color: var(--primary);
+  border-color: var(--primary);
+  opacity: 1;
+}
+
+

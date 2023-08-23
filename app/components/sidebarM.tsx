@@ -108,6 +108,7 @@ export function SessionConfigModel(props: {
               } else {
                 chatStore.newSession(props.editingMask);
                 setIsLoading(true);
+                navigate(Path.Meetings);
                 chatStore
                   .onUserInput(
                     Locale.Context.Supplay +
@@ -117,6 +118,7 @@ export function SessionConfigModel(props: {
                     },
                   )
                   .then(() => setIsLoading(false));
+
                 props.onClose();
               }
 

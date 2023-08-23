@@ -25,6 +25,8 @@ export type ChatMessage = RequestMessage & {
   model?: ModelType;
   flag?: boolean;
   attr?: any;
+  avatar?: any;
+  roundtype?: any;
 };
 export type newRole = RequestMessage & {
   date: string;
@@ -55,9 +57,9 @@ export interface ChatStat {
 export interface ChatSession {
   id: number;
   topic: string;
-
   memoryPrompt: string;
   messages: ChatMessage[];
+  hideMessage: ChatMessage[];
   stat: ChatStat;
   lastUpdate: number;
   lastSummarizeIndex: number;
@@ -77,6 +79,7 @@ function createEmptySession(): ChatSession {
     topic: DEFAULT_TOPIC,
     memoryPrompt: "",
     messages: [],
+    hideMessage: [],
     stat: {
       tokenCount: 0,
       wordCount: 0,
@@ -84,7 +87,6 @@ function createEmptySession(): ChatSession {
     },
     lastUpdate: Date.now(),
     lastSummarizeIndex: 0,
-
     mask: createEmptyMask(),
   };
 }
@@ -97,7 +99,6 @@ interface ChatStore {
   globalId: number;
   roleIdx: number; //循环到了数组的第几个
   roundRole: number; //对话轮数
-  isStop?: boolean;
   clearSessions: () => void;
   doSelf: (index: number) => void;
   moveSession: (from: number, to: number) => void;
@@ -361,176 +362,171 @@ export const useChatStore = create<ChatStore>()(
       doSelf(idx) {
         let index = idx;
         const session = get().currentSession();
+        if (session.mask.stopSpeak) return;
         const modelConfig = session.mask.modelConfig;
         const messages = session.messages;
-        console.log("打印新函数", session, index, get().roleIdx);
-
-        let topicMessages = messages;
-        if (session?.mask?.newRole?.length > 0) {
-          // console.log('打印新函数',session)
-          // session.mask.newRole.map((item, i) => {
-          // console.log(
-          //   "接口就回家",
-          //   get().roleIdx,
-          //   index,
-          //   session,
-          //   get().roleIdx == index,
-          // );
-
-          if (
-            get().roleIdx == index ||
-            (get().roleIdx == index - 1 && session.mask?.programme)
-          ) {
-            // topicMessages.concat(
-            //   createMessage({
-            //     role: "user",
-            //     content: '作为'+item.content+'角色对上述对话发言，并总结',
-            //   }),
-            // )
-            let content;
-            if (index == session.mask.newRole?.length) {
-              content = Locale.Mask.Role.secretary;
-            } else if (index == session.mask.newRole?.length + 1) {
-              content = "请根据上述内容生成一份详细的执行计划时间表";
-              // index=index-1;
-            } else {
-              // content = `作为${
-              //   session.mask.newRole[index].content
-              // }角色对上述对话进行第${get().roundRole}轮发言，并总结`;
-              content = Locale.Mask.Role.description(
-                get().roundRole,
-                session.mask.newRole[index].content,
-                session.mask.newRole[index].date
-                  ? "," + session.mask.newRole[index].date
-                  : "",
-              );
-            }
-            topicMessages.push(
-              createMessage({
-                role: "user",
-                content: content,
-              }),
+        const hmessages = session.hideMessage;
+        // console.log("打印新函数", session, index, get().roleIdx);
+        let topicMessages = hmessages;
+        if (
+          session?.mask?.newRole?.length > 0 &&
+          (get().roleIdx == index ||
+            (get().roleIdx == index - 1 && session.mask?.programme))
+        ) {
+          let content;
+          if (index == session.mask.newRole?.length) {
+            content = Locale.Mask.Role.secretary;
+          } else if (index == session.mask.newRole?.length + 1) {
+            content = "请根据上述内容生成一份详细的执行计划时间表";
+            // index=index-1;
+          } else {
+            content = Locale.Mask.Role.description(
+              get().roundRole,
+              session.mask.newRole[index].content,
+              session.mask.newRole[index].date
+                ? "," + session.mask.newRole[index].date
+                : "",
             );
-            const userMessage: ChatMessage = createMessage({
+          }
+          topicMessages.push(
+            createMessage({
               role: "user",
-              content,
-            });
-            const botMessage: ChatMessage = createMessage({
-              role: "assistant",
-              streaming: true,
-              id: userMessage.id! + 1,
-              model: modelConfig.model,
-            });
-            get().updateCurrentSession((session) => {
-              // session.messages.push(userMessage);
-              session.messages.push(botMessage);
-            });
-            // debugger
-            const sessionIndex = get().currentSessionIndex;
-            const messageIndex = get().currentSession().messages.length + 1;
+              content: content,
+            }),
+          );
+          const userMessage: ChatMessage = createMessage({
+            role: "user",
+            content,
+          });
+          const botMessage: ChatMessage = createMessage({
+            role: "assistant",
+            streaming: true,
+            id: userMessage.id! + 1,
+            model: modelConfig.model,
+          });
+          get().updateCurrentSession((session) => {
+            if (index < session.mask.newRole.length) {
+              botMessage.avatar = session.mask.newRole[index].content;
+              if (index == 0) {
+                let roundtype = "一";
+                if (get().roundRole == 1) {
+                  roundtype = "一";
+                } else if (get().roundRole == 2) {
+                  roundtype = "二";
+                } else if (get().roundRole == 3) {
+                  roundtype = "三";
+                } else if (get().roundRole == 4) {
+                  roundtype = "四";
+                } else if (get().roundRole == 5) {
+                  roundtype = "五";
+                }
+                console.log("测试", get().roundRole);
+                let string = `第${roundtype}轮发言`;
+                botMessage.roundtype = string;
+              }
+            }
+            session.messages.push(botMessage);
+            session.hideMessage.push(botMessage);
+          });
+          // debugger
+          const sessionIndex = get().currentSessionIndex;
+          const messageIndex = get().currentSession().messages.length + 1;
 
-            // console.log('循环角色', index,topicMessages)
-            api.llm.chat({
-              messages: topicMessages,
-              config: { ...modelConfig, stream: true },
-              Journey: false,
-              onUpdate(message) {
-                botMessage.streaming = true;
-                if (message) {
-                  // console.log('更新消息内容',message)
-                  botMessage.content = message;
-                }
-                set(() => ({}));
-              },
-              onFinish(message) {
-                botMessage.streaming = false;
-                if (message) {
-                  botMessage.content = message;
-                  get().onNewMessage(botMessage);
-                }
-                ChatControllerPool.remove(
-                  sessionIndex,
-                  botMessage.id ?? messageIndex,
-                );
-                set(() => ({}));
-                if (index < session.mask.newRole?.length) {
-                  if (index < session.mask.newRole?.length - 1) {
+          console.log("循环角色", index, topicMessages);
+          api.llm.chat({
+            messages: topicMessages,
+            config: { ...modelConfig, stream: true },
+            Journey: false,
+            onUpdate(message) {
+              botMessage.streaming = true;
+              if (message) {
+                // console.log('更新消息内容',message)
+                botMessage.content = message;
+              }
+              set(() => ({}));
+            },
+            onFinish(message) {
+              botMessage.streaming = false;
+              if (message) {
+                botMessage.content = message;
+                get().onNewMessage(botMessage);
+              }
+              ChatControllerPool.remove(
+                sessionIndex,
+                botMessage.id ?? messageIndex,
+              );
+              set(() => ({}));
+              if (index < session.mask.newRole?.length) {
+                if (index < session.mask.newRole?.length - 1) {
+                  set(() => ({
+                    roleIdx: index + 1,
+                  }));
+                } else {
+                  // console.log('测试打印',index,session.mask.newRole.length,get().roundRole<=modelConfig.roleNumber,get().roundRole,modelConfig.roleNumber)
+                  if (get().roundRole < modelConfig.roleNumber) {
                     set(() => ({
-                      roleIdx: index + 1,
+                      roleIdx: 0,
+                      roundRole: get().roundRole + 1,
                     }));
                   } else {
-                    // console.log('测试打印',index,session.mask.newRole.length,get().roundRole<=modelConfig.roleNumber,get().roundRole,modelConfig.roleNumber)
-                    if (get().roundRole < modelConfig.roleNumber) {
-                      set(() => ({
-                        roleIdx: 0,
-                        roundRole: get().roundRole + 1,
-                      }));
-                    } else {
-                      set(() => ({
-                        roleIdx: index + 1,
-                      }));
-                    }
-                  }
-                  if (
-                    get().roundRole == modelConfig.roleNumber &&
-                    index == session.mask?.newRole?.length
-                  ) {
                     set(() => ({
                       roleIdx: index + 1,
-                      roundRole: 1,
                     }));
                   }
-                  // console.log('小秘书结束了吗',index,get().roundRole)
-                  get().doSelf(get().roleIdx);
-                  console.log("测试打印", get().roleIdx);
-                } else {
-                  if (session.mask?.programme && !session.mask.flag) {
-                    // set(() => ({
-                    //   roleIdx: index + 1,
-                    //   // roundRole: 1,
-                    // }));
-                    get().doSelf(get().roleIdx + 1);
-                  }
-                  get().updateCurrentSession((session) => {
-                    session.mask.flag = true;
-                  });
-                  console.log("小秘书结束了吗1111", index, get().roundRole);
                 }
-              },
-              onError(error) {
-                // console.log('错误打印',error)
-                const isAborted = error.message.includes("aborted");
-                botMessage.content =
-                  "\n\n" +
-                  prettyObject({
-                    error: true,
-                    message: error.message,
-                  });
-                botMessage.streaming = false;
-                userMessage.isError = !isAborted;
-                botMessage.isError = !isAborted;
-                // set(() => ({
-                //   roleIdx:index+1
-                // }));
-                set(() => ({}));
-                ChatControllerPool.remove(
-                  sessionIndex,
-                  botMessage.id ?? messageIndex,
-                );
+                if (
+                  get().roundRole == modelConfig.roleNumber &&
+                  index == session.mask?.newRole?.length
+                ) {
+                  set(() => ({
+                    roleIdx: index + 1,
+                    roundRole: 1,
+                  }));
+                }
+                get().doSelf(get().roleIdx);
+                console.log("测试打印", get().roleIdx);
+              } else {
+                if (session.mask?.programme && !session.mask.flag) {
+                  get().doSelf(get().roleIdx + 1);
+                }
+                get().updateCurrentSession((session) => {
+                  session.mask.flag = true;
+                });
+                console.log("小秘书结束了吗1111", index, get().roundRole);
+              }
+            },
+            onError(error) {
+              // console.log('错误打印',error)
+              const isAborted = error.message.includes("aborted");
+              botMessage.content =
+                "\n\n" +
+                prettyObject({
+                  error: true,
+                  message: error.message,
+                });
+              botMessage.streaming = false;
+              userMessage.isError = !isAborted;
+              botMessage.isError = !isAborted;
+              // set(() => ({
+              //   roleIdx:index+1
+              // }));
+              set(() => ({}));
+              ChatControllerPool.remove(
+                sessionIndex,
+                botMessage.id ?? messageIndex,
+              );
 
-                console.error("[Chat] failed ", error);
-              },
-              onController(controller) {
-                // collect controller for stop/retry
-                ChatControllerPool.addController(
-                  sessionIndex,
-                  botMessage.id ?? messageIndex,
-                  controller,
-                );
-              },
-            });
-          }
-          // })
+              console.error("[Chat] failed ", error);
+            },
+            onController(controller) {
+              // collect controller for stop/retry
+              ChatControllerPool.addController(
+                sessionIndex,
+                botMessage.id ?? messageIndex,
+                controller,
+              );
+            },
+          });
         }
 
         // console.log('打印新函数111111',get().roleIdx)
@@ -599,16 +595,18 @@ export const useChatStore = create<ChatStore>()(
         // save user's and bot's message
         get().updateCurrentSession((session) => {
           session.messages.push(userMessage);
+          session.hideMessage.push(userMessage);
+
           if (session?.mask?.newRole?.length > 0 && !session.mask.flag) {
             set(() => ({
               roleIdx: 0,
               roundRole: 1,
-              isStop: true,
             }));
             get().doSelf(0);
             return;
           }
           session.messages.push(botMessage);
+          session.hideMessage.push(botMessage);
         });
         if (session?.mask?.newRole?.length > 0 && !session.mask.flag) {
           return;

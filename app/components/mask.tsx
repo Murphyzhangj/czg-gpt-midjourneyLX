@@ -104,6 +104,31 @@ export function MaskConfig(props: {
             ></InputRange>
           </ListItem>
         ) : null}
+        <ListItem title="是否生成执行方案">
+          <input
+            type="checkbox"
+            checked={props.mask.programme}
+            onChange={(e) => {
+              props.updateMask((mask) => {
+                mask.programme = e.currentTarget.checked;
+              });
+            }}
+          ></input>
+        </ListItem>
+        {/* <ListItem
+          title="是否是单轮会议"
+        >
+          <input
+            type="checkbox"
+            checked={props.mask.flag}
+            onChange={(e) => {
+              props.updateMask((mask) => {
+                mask.flag = e.currentTarget.checked;
+              });
+            }}
+          ></input>
+        </ListItem> */}
+
         <ListItem title={Locale.Mask.Config.Avatar}>
           <Popover
             content={

@@ -246,7 +246,18 @@ export function PromptHints(props: {
     </div>
   );
 }
-
+function MeetRound(props: { message: any }) {
+  return (
+    <div className={`${styles["chat-message-meeting-rounds"]}`}>
+      <div className={chatStyle["clear-context-tips"]}>
+        {props.message.roundtype}
+      </div>
+      <div className={chatStyle["clear-context-revert-btn"]}>
+        {props.message.roundtype}
+      </div>
+    </div>
+  );
+}
 function ClearContextDivider() {
   const chatStore = useChatStore();
 
@@ -268,7 +279,17 @@ function ClearContextDivider() {
     </div>
   );
 }
-
+function MeetAvatar(props: { avatar: any }) {
+  const avatar = props.avatar.slice(0, 1);
+  return (
+    <div className={`${styles["chat-message-meeting"]} no-dark`}>
+      <div className={`${styles["chat-message-meeting-avatar"]} user-avatar`}>
+        {avatar}
+      </div>
+      <div className={styles["chat-message-status"]}>{props.avatar}</div>
+    </div>
+  );
+}
 function useScrollToBottom() {
   // for auto-scroll
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -318,7 +339,7 @@ export function ChatActions(props: {
   // stop all responses
   const couldStop = ChatControllerPool.hasPending();
   const stopAll = () => ChatControllerPool.stopAll();
-
+  // console.log(ChatControllerPool)
   function selectImage() {
     document.getElementById("chat-image-file-select-upload")?.click();
   }
@@ -516,7 +537,7 @@ export function Chat() {
   const doSubmit = async (userInput: string) => {
     // console.log('session',session.mask.modelConfig.isJourney);
     chatStore.updateCurrentSession((session) => {
-      console.log("session", session);
+      // console.log("session", session);
       if (session.mask.isJourney) {
         if (
           userInput.toLowerCase().startsWith("/mj") ||
@@ -806,14 +827,32 @@ export function Chat() {
             </div>
           )} */}
 
-          {/* <div className="window-action-button">
+          <div className="window-action-button">
             <button
-              onClick={() =>{}}
+              onClick={() => {
+                if (session.mask.flag) {
+                  chatStore.updateCurrentSession((session) => {
+                    session.mask.flag = false;
+                    session.mask.stopSpeak = false;
+                  });
+                  chatStore
+                    .onUserInput(Locale.Context.Supplay + session.mask.name, {
+                      setAutoScroll,
+                    })
+                    .then(() => setIsLoading(false));
+                } else {
+                  chatStore.updateCurrentSession((session) => {
+                    session.mask.flag = true;
+                    session.mask.stopSpeak = true;
+                  });
+                  ChatControllerPool.stopAll();
+                }
+              }}
               className={`${styles["chat-message-action-btn"]} clickable`}
             >
-              重新发言
+              {session.mask.flag ? "重新发言" : "停止发言"}
             </button>
-          </div> */}
+          </div>
         </div>
 
         <PromptToast
@@ -835,17 +874,17 @@ export function Chat() {
         }}
       >
         {messages.map((message, i) => {
+          // console.log('打印一下试试',messages)
           const isUser = message.role === "user";
           const showActions =
             !isUser &&
             i > 0 &&
             !(message.preview || message.content.length === 0);
           const showTyping = message.preview || message.streaming;
-
           const shouldShowClearContextDivider = i === clearContextIndex - 1;
-
           return (
             <>
+              {message.roundtype && <MeetRound message={message} />}
               <div
                 key={i}
                 className={
@@ -863,10 +902,17 @@ export function Chat() {
                   <div className={styles["chat-message-avatar"]}>
                     {message.role === "user" ? (
                       <Avatar avatar={config.avatar} />
+                    ) : message.avatar ? (
+                      <MeetAvatar avatar={message.avatar} />
                     ) : (
                       <MaskAvatar mask={session.mask} />
                     )}
                   </div>
+                  {/* {!showTyping && message.avatar && (
+                    <div className={styles["chat-message-status"]}>
+                      {message.avatar}
+                    </div>
+                  )} */}
                   {showTyping && (
                     <div className={styles["chat-message-status"]}>
                       {Locale.Chat.Typing}
@@ -1098,7 +1144,8 @@ export function Chat() {
             ref={inputRef}
             className={styles["chat-input"]}
             placeholder={
-              useImages.length > 0 && mjImageMode != "IMAGINE"
+              (useImages.length > 0 && mjImageMode != "IMAGINE") ||
+              !session.mask.flag
                 ? Locale.Midjourney.InputDisabled
                 : Locale.Chat.Input(submitKey)
             }
@@ -1109,14 +1156,20 @@ export function Chat() {
             onBlur={() => setAutoScroll(false)}
             rows={inputRows}
             autoFocus={autoFocus}
-            disabled={useImages.length > 0 && mjImageMode != "IMAGINE"}
+            disabled={
+              (useImages.length > 0 && mjImageMode != "IMAGINE") ||
+              !session.mask.flag
+            }
           />
           <IconButton
             icon={<SendWhiteIcon />}
-            text={Locale.Chat.Send}
+            text={!session.mask.flag ? "讨论中" : Locale.Chat.Send}
             className={styles["chat-input-send"]}
             type="primary"
-            onClick={() => doSubmit(userInput)}
+            onClick={() => {
+              if (!session.mask.flag) return;
+              doSubmit(userInput);
+            }}
           />
         </div>
       </div>

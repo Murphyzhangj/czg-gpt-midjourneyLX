@@ -19,7 +19,8 @@ export type Mask = {
   lang: Lang;
   builtin: boolean;
   programme?: boolean;
-  flag?: boolean;
+  flag?: boolean; //是否这次会议对话结束
+  stopSpeak?: boolean;
 };
 
 export const DEFAULT_MASK_STATE = {
