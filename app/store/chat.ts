@@ -362,6 +362,7 @@ export const useChatStore = create<ChatStore>()(
       doSelf(idx) {
         let index = idx;
         const session = get().currentSession();
+
         if (session.mask.stopSpeak) return;
         const modelConfig = session.mask.modelConfig;
         const messages = session.messages;
@@ -484,7 +485,7 @@ export const useChatStore = create<ChatStore>()(
                   }));
                 }
                 get().doSelf(get().roleIdx);
-                console.log("测试打印", get().roleIdx);
+                // console.log("测试打印", get().roleIdx);
               } else {
                 if (session.mask?.programme && !session.mask.flag) {
                   get().doSelf(get().roleIdx + 1);
@@ -492,7 +493,7 @@ export const useChatStore = create<ChatStore>()(
                 get().updateCurrentSession((session) => {
                   session.mask.flag = true;
                 });
-                console.log("小秘书结束了吗1111", index, get().roundRole);
+                // console.log("小秘书结束了", index, get().roundRole);
               }
             },
             onError(error) {
@@ -605,7 +606,9 @@ export const useChatStore = create<ChatStore>()(
             get().doSelf(0);
             return;
           }
+
           session.messages.push(botMessage);
+          // console.log('接口和接口和还款金',session,botMessage,userMessage)
           session.hideMessage.push(botMessage);
         });
         if (session?.mask?.newRole?.length > 0 && !session.mask.flag) {

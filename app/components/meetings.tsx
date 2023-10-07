@@ -84,7 +84,7 @@ export function SessionConfigModel(props: { onClose: () => void }) {
             key="reset"
             icon={<ResetIcon />}
             bordered
-            text="开始会议"
+            text="清除记忆"
             onClick={() => {
               if (confirm(Locale.Memory.ResetConfirm)) {
                 chatStore.updateCurrentSession(
@@ -691,7 +691,8 @@ export function Chat() {
 
   if (
     context.length === 0 &&
-    session.messages.at(0)?.content !== BOT_HELLO.content
+    session.messages.at(0)?.content !== BOT_HELLO.content &&
+    session.mask.newRole?.length < 1
   ) {
     const copiedHello = Object.assign({}, BOT_HELLO);
     if (!accessStore.isAuthorized()) {
@@ -874,7 +875,7 @@ export function Chat() {
         }}
       >
         {messages.map((message, i) => {
-          // console.log('打印一下试试',messages)
+          // console.log('打印一下试试22222',messages)
           const isUser = message.role === "user";
           const showActions =
             !isUser &&
